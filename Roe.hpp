@@ -155,7 +155,7 @@ void Roe::setE()
         delete [] e;
     }
     e = new double[n];
-    for(i=0;i<n;i++) e[i] = p[2][i]/(gama-1)+1/2*p[1][i]*p[0][i]*p[0][i];
+    for(i=0;i<n;i++) e[i] = p[2][i]/(gama-1)+0.5*p[1][i]*p[0][i]*p[0][i];
 }
 
 void Roe::setU()
