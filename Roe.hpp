@@ -24,14 +24,6 @@ public:
     virtual void setN(long);
     
     /**
-     *  name    setGama   set the gama
-     *  return  void
-     *  param   double   the value
-     *
-     **/
-    void setGama(double);
-    
-    /**
      *  name    setCFL   set the CFL
      *  return  void
      *  param   double   the value
@@ -40,20 +32,21 @@ public:
     void setCFL(double);
     
     /**
+     *  name    setTol   set the TOL
+     *  return  void
+     *  param   double   the value
+     *
+     **/
+    void setTol(double);
+    
+    /**
      *  name    solve   solve the Roe
      *  return  void
      *
      **/
-    void solve();
+    virtual void solve();
     
 private:
-    
-    /**
-     *  name    setE   set the internal energy
-     *  return  void
-     *
-     **/
-    void setE();
     
     /**
      *  name    setU   set the time temporary value
@@ -73,38 +66,30 @@ private:
     void RiemannSolve(long, double**&, double**&);
     
     /**
-     *  gama
-     */
-    double gama = 1.4;
-    
-    /**
      *  CFL
      */
     double CFL = 0.9;
     
     /**
-     *  internal energy
-     */
-    double* e = NULL;
-    
-    /**
      *  time temporary value
      */
     double** u = NULL;
+    
+    /**
+     *  Contrast entropy correction 对比熵修正
+     */
+    double tol = 0.000001;
 };
 
 Roe::Roe()
 {
     construction();
-    setE();
     setU();
 }
 
 Roe::~Roe()
 {
     deleteArray(u);
-    delete [] e;
-    e = NULL;
 }
 
 void Roe::output(string filename) const
@@ -113,7 +98,7 @@ void Roe::output(string filename) const
     ofstream out(filePath+filename);
     if (out.is_open())
     {
-        out<<x1<<" "<<deltaX<<" "<<x2<<"\n";
+        out<<x1<<" "<<deltaX<<" "<<x2<<" "<<setprecision(12)<<fixed<<tol<<"\n";
         for(i=0;i<3;i++)
         {
             for(j=0;j<n;j++)
@@ -122,7 +107,7 @@ void Roe::output(string filename) const
         }
         out.close();
     }
-    cout<<"Roe successful"<<endl;
+    cout<<"Roe successful  tol="<<tol<<endl;
 }
 
 void Roe::setN(long value)
@@ -135,27 +120,16 @@ void Roe::setN(long value)
     setU();
 }
 
-void Roe::setGama(double value)
-{
-    if (value<0) gama = 0;
-    else gama = value;
-}
-
 void Roe::setCFL(double value)
 {
     if (value<0) CFL = 0;
     else CFL = value;
 }
 
-void Roe::setE()
+void Roe::setTol(double value)
 {
-    long i;
-    if (e!=NULL)
-    {
-        delete [] e;
-    }
-    e = new double[n];
-    for(i=0;i<n;i++) e[i] = p[2][i]/(gama-1)+0.5*p[1][i]*p[0][i]*p[0][i];
+    if (value<0) tol = 0;
+    else tol = value;
 }
 
 void Roe::setU()
@@ -173,7 +147,6 @@ void Roe::setU()
 
 void Roe::RiemannSolve(long index, double**& uTemp, double**& f)
 {
-    //double rL,vL,eL,pL,rR,vR,eR,pR,uS,aS,hS,eLTemp,eRTemp,hL,hR;
     double lamda[3],l[6],r[6],s[3],tol,sm[3],sFinal[3];
     
     l[0] = uTemp[0][index];
@@ -191,13 +164,15 @@ void Roe::RiemannSolve(long index, double**& uTemp, double**& f)
     r[5] = (r[4]+r[3])/r[0];
     s[2] = (sqrt(l[0])*l[5]+sqrt(r[0])*r[5])/(sqrt(l[0])+sqrt(r[0]));
     s[1] = sqrt((gama-1)*(s[2]-0.5*s[1]*s[1]));
-    tol = 0.000001;
+    
+    //Get the eigenvalues
     if (fabs(s[0])>=tol) lamda[0] = fabs(s[0]);
     else lamda[0]=(s[0]*s[0]+tol*tol)/2.0/tol;
     if (fabs(s[0]+s[1])>=tol) lamda[1] = fabs(s[0]+s[1]);
     else lamda[1]=((s[0]+s[1])*(s[0]+s[1])+tol*tol)/2.0/tol;
     if (fabs(s[0]-s[1])>=tol) lamda[2] = fabs(s[0]-s[1]);
     else lamda[2]=((s[0]-s[1])*(s[0]-s[1])+tol*tol)/2.0/tol;
+    
     double S[3][3] = {1,1,1,s[0],s[0]+s[1],s[0]-s[1],0.5*s[0]*s[0],s[2]+s[0]*s[1],s[2]-s[0]*s[1]};
     sm[0] = (gama-1)/(s[1]*s[1])*((r[0]-l[0])*(s[2]-s[0]*s[0])+s[0]*(r[1]*r[0]-l[1]*l[0])-(r[2]-l[2]));
     sm[1]=0.5/s[1]*((r[0]-l[0])*(-s[0]+s[1])+(r[1]*r[0]-l[1]*l[0])-s[1]*sm[0]);
