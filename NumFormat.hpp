@@ -9,16 +9,23 @@
 #ifndef NumFormat_hpp
 #define NumFormat_hpp
 
+#include <math.h>
+#include <fstream>
+
+using namespace std;
+
 class NumFormat
 {
 public:
+    
+    ~NumFormat();
     
     /**
      *  name    output   output results by array
      *  return  double**
      *
      **/
-    virtual double** output() const = 0;
+    virtual void output(string) const = 0;
     
     /**
      *  name    setT   set the end time
@@ -59,6 +66,14 @@ public:
      *
      **/
     void setMiddleX(double);
+    
+    /**
+     *  name    setFilePath
+     *  return  void
+     *  param   string   the file path
+     *
+     **/
+    void setFilePath(string);
     
 protected:
     
@@ -140,7 +155,19 @@ protected:
      *  answer array
      */
     double** p = NULL;
+    
+    /**
+     *  file path
+     */
+    string filePath = "~/";
 };
+
+
+NumFormat::~NumFormat()
+{
+    deleteArray(p);
+    p = NULL;
+}
 
 void NumFormat::setT(double value)
 {
@@ -175,6 +202,11 @@ void NumFormat::setMiddleX(double value)
     if (value>x2) middleX = x2;
     else if (value<x1) middleX = x1;
     else middleX = value;
+}
+
+void NumFormat::setFilePath(string str)
+{
+    if (str != "") filePath = str;
 }
 
 void NumFormat::setDeltaX()
