@@ -10,6 +10,7 @@
 #define NumFormat_hpp
 
 #include <math.h>
+#include <iomanip>
 #include <fstream>
 
 using namespace std;
@@ -68,6 +69,21 @@ public:
     void setMiddleX(double);
     
     /**
+     *  name    setGama   set the gama
+     *  return  void
+     *  param   double   the value
+     *
+     **/
+    void setGama(double);
+    
+    /**
+     *  name    solve   solve the Riemann
+     *  return  void
+     *
+     **/
+    virtual void solve() = 0;
+    
+    /**
      *  name    setFilePath
      *  return  void
      *  param   string   the file path
@@ -99,13 +115,6 @@ protected:
     void construction();
     
     /**
-     *  name    destruction   normal destruction for all sons
-     *  return  void
-     *
-     **/
-    void destruction();
-    
-    /**
      *  name    deleteArray   delete the target array
      *  return  void
      *  param   double**   target array
@@ -120,6 +129,13 @@ protected:
      *
      **/
     void newArray(double**&);
+    
+    /**
+     *  name    setE   set the internal energy
+     *  return  void
+     *
+     **/
+    void setE();
     
     /**
      *  end time
@@ -157,6 +173,16 @@ protected:
     double** p = NULL;
     
     /**
+     *  internal energy
+     */
+    double* e = NULL;
+    
+    /**
+     *  gama
+     */
+    double gama = 1.4;
+    
+    /**
      *  file path
      */
     string filePath = "~/";
@@ -167,6 +193,8 @@ NumFormat::~NumFormat()
 {
     deleteArray(p);
     p = NULL;
+    delete [] e;
+    e = NULL;
 }
 
 void NumFormat::setT(double value)
@@ -195,6 +223,7 @@ void NumFormat::setN(long value)
     else n = value;
     setDeltaX();
     reset();
+    setE();
 }
 
 void NumFormat::setMiddleX(double value)
@@ -202,6 +231,13 @@ void NumFormat::setMiddleX(double value)
     if (value>x2) middleX = x2;
     else if (value<x1) middleX = x1;
     else middleX = value;
+}
+
+
+void NumFormat::setGama(double value)
+{
+    if (value<0) gama = 0;
+    else gama = value;
 }
 
 void NumFormat::setFilePath(string str)
@@ -240,6 +276,7 @@ void NumFormat::construction()
 {
     setDeltaX();
     reset();
+    setE();
 }
 
 void NumFormat::deleteArray(double**& arr)
@@ -258,6 +295,17 @@ void NumFormat::newArray(double**& arr)
     int i;
     arr = new double*[3];
     for(i=0;i<3;i++) arr[i] = new double[n];
+}
+
+void NumFormat::setE()
+{
+    long i;
+    if (e!=NULL)
+    {
+        delete [] e;
+    }
+    e = new double[n];
+    for(i=0;i<n;i++) e[i] = p[2][i]/(gama-1)+0.5*p[1][i]*p[0][i]*p[0][i];
 }
 
 #endif /* NumFormat_hpp */
