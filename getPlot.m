@@ -19,7 +19,7 @@ function getPlot(filename,bool)
     fclose(fid);
 
     %%  输出图像
-    outPlot(value,Roe(1,:),[filename,'Velocity'],'Roe 速度分布图','Velocity',bool);
-    outPlot(value,Roe(2,:),[filename,'Density'],'Roe 密度分布图','Density',bool);
-    outPlot(value,Roe(3,:),[filename,'Pressure'],'Roe 压力分布图','Pressure',bool);
+    outPlot(value,Roe(1,:),[filename,'Velocity'],[filename,' 速度分布图'],'Velocity',bool);
+    outPlot(value,Roe(2,:),[filename,'Density'],[filename,' 密度分布图'],'Density',bool);
+    outPlot(value,Roe(3,:),[filename,'Pressure'],[filename,' 压力分布图'],'Pressure',bool);
 end
