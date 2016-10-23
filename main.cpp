@@ -9,11 +9,15 @@
 #include <iostream>
 #include "Roe.hpp"
 #include "StegerWarming.hpp"
+#include "AUSM.hpp"
 
+/**
+ *  output file path
+ */
 const string FILEPATH="/Users/cncuser/Desktop/c_code/CFD2/CFD2/";
 
 int main(int argc, const char * argv[]) {
-    Roe roe;
+    /*Roe roe;
     roe.setFilePath(FILEPATH);
     roe.solve();        //normal tol=0.000001
     roe.output("Roe1.txt");
@@ -33,7 +37,9 @@ int main(int argc, const char * argv[]) {
     StegerWarming sw;
     sw.setFilePath(FILEPATH);
     sw.solve();
-    sw.output("StegerWarming.txt");
+    sw.output("StegerWarming.txt");*/
+    AUSM ausm;
+    ausm.setFilePath(FILEPATH);
     
     return 0;
 }

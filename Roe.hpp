@@ -204,7 +204,8 @@ void Roe::solve()
         for(j=0;j<n;j++)
             u1[i][j] = u[i][j];
     
-    while (tNow<t) {
+    while (tNow<t)
+    {
         for(i=0;i<n;i++) a[i]=sqrt(gama*p[2][i]/p[1][i]);
         for(i=0;i<n;i++)
             if ((fabs(p[0][i])+a[i])>max) max = fabs(p[0][i])+a[i];
