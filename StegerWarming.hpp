@@ -50,7 +50,7 @@ private:
     /**
      *  step length of t axis
      */
-    double deltaT = 0.001;
+    double deltaT = 0.0001;
     
     long m;
 };
@@ -58,6 +58,7 @@ private:
 StegerWarming::StegerWarming()
 {
     construction();
+    setM();
 }
 
 StegerWarming::~StegerWarming()
@@ -79,7 +80,7 @@ void StegerWarming::output(string filename) const
         }
         out.close();
     }
-    cout<<"Steger successful"<<endl;
+    cout<<"StegerWarming successful"<<endl;
 }
 
 void StegerWarming::setN(long value)
@@ -93,7 +94,7 @@ void StegerWarming::setN(long value)
 
 void StegerWarming::setDeltaT(double value)
 {
-    if (value<=0) deltaT = 0.001;
+    if (value<=0) deltaT = 0.0001;
     else if (value>t) deltaT = t;
     else deltaT = value;
 }
