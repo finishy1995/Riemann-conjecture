@@ -12,3 +12,4 @@ getPlot('Roe5',1);
 
 %%  ¶Ô±ÈStegerWarming¡¢AUSMºÍRoe
 getPlot('StegerWarming',0);
+getPlot('AUSM',0);

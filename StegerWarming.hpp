@@ -15,13 +15,13 @@ class StegerWarming : public NumFormat
 {
 public:
     
-    StegerWarming();
+    StegerWarming(){setM();}
     
-    ~StegerWarming();
+    ~StegerWarming(){}
     
     virtual void output(string) const;
     
-    virtual void setN(long);
+    virtual void solve();
     
     /**
      *  name    setDeltaT   set the step length of t axis
@@ -31,21 +31,24 @@ public:
      **/
     void setDeltaT(double);
     
-    /**
-     *  name    solve   solve the Riemann by StegerWarming
-     *  return  void
-     *
-     **/
-    virtual void solve();
-    
 private:
     
     /**
-     *  name    setm   set the step number of t axis
+     *  name    setM   set the step number of t axis
      *  return  void
      *
      **/
     void setM();
+    
+    /**
+     *  name    RiemannSolve   use AUSM to solve Riemann Problem
+     *  return  void
+     *  param   long   the index of array
+     *  param   double**   the array(u & u1)
+     *  param   double**   the target array(f)
+     *
+     **/
+    void RiemannSolve(long, double**&, double**&);
     
     /**
      *  step length of t axis
@@ -55,15 +58,6 @@ private:
     long m;
 };
 
-StegerWarming::StegerWarming()
-{
-    construction();
-    setM();
-}
-
-StegerWarming::~StegerWarming()
-{
-}
 
 void StegerWarming::output(string filename) const
 {
@@ -83,31 +77,23 @@ void StegerWarming::output(string filename) const
     cout<<"StegerWarming successful"<<endl;
 }
 
-void StegerWarming::setN(long value)
-{
-    if (n<2) n = 2;
-    else n = value;
-    setDeltaX();
-    reset();
-    setE();
-}
-
 void StegerWarming::setDeltaT(double value)
 {
     if (value<=0) deltaT = 0.0001;
     else if (value>t) deltaT = t;
     else deltaT = value;
+    setM();
 }
 
 void StegerWarming::setM()
 {
-    m = t/deltaT;
+    m = ceil(t/deltaT);
 }
 
 void StegerWarming::solve()
 {
+    double ee = 0.00000001; // Set the minimum value to avoid lamda(+,-) = 0
     long i,j,k;
-    double ee = 0.00000001;
     double temp1,temp2;
     double epso[n],c[n];
     double lamda[3][n],lamdaP[3][n],lamdaN[3][n],fP[3][n],fN[3][n];

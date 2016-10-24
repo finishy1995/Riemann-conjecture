@@ -9,6 +9,7 @@
 #ifndef NumFormat_hpp
 #define NumFormat_hpp
 
+#include <iostream>
 #include <math.h>
 #include <iomanip>
 #include <fstream>
@@ -22,11 +23,18 @@ public:
     ~NumFormat();
     
     /**
-     *  name    output   output results by array
-     *  return  double**
+     *  name    output   output results by .txt file
+     *  param   string   the file name
      *
      **/
     virtual void output(string) const = 0;
+    
+    /**
+     *  name    solve   solve the Riemann Problem
+     *  return  void
+     *
+     **/
+    virtual void solve() = 0;
     
     /**
      *  name    setT   set the end time
@@ -58,7 +66,7 @@ public:
      *  param   long   the value
      *
      **/
-    virtual void setN(long);
+    void setN(long);
     
     /**
      *  name    setMiddleX   set the cut-point in x axis
@@ -69,19 +77,12 @@ public:
     void setMiddleX(double);
     
     /**
-     *  name    setGama   set the gama
+     *  name    setGama   set the gama γ
      *  return  void
      *  param   double   the value
      *
      **/
     void setGama(double);
-    
-    /**
-     *  name    solve   solve the Riemann
-     *  return  void
-     *
-     **/
-    virtual void solve() = 0;
     
     /**
      *  name    setFilePath
@@ -93,6 +94,24 @@ public:
     
 protected:
     
+    NumFormat();
+    
+    /**
+     *  name    newArray   new the target array double**
+     *  return  void
+     *  param   double**   target array
+     *
+     **/
+    void newArray(double**&);
+    
+    /**
+     *  name    deleteArray   delete the target array double**
+     *  return  void
+     *  param   double**   target array
+     *
+     **/
+    void deleteArray(double**&);
+    
     /**
      *  name    setDeltaX   set the step length of x axis
      *  return  void
@@ -101,34 +120,11 @@ protected:
     void setDeltaX();
     
     /**
-     *  name    reset   reset the answer array
+     *  name    reset   reset the answer array p
      *  return  void
      *
      **/
     void reset();
-    
-    /**
-     *  name    construction   normal construction for all sons
-     *  return  void
-     *
-     **/
-    void construction();
-    
-    /**
-     *  name    deleteArray   delete the target array
-     *  return  void
-     *  param   double**   target array
-     *
-     **/
-    void deleteArray(double**&);
-    
-    /**
-     *  name    newArray   new the target array
-     *  return  void
-     *  param   double**   target array
-     *
-     **/
-    void newArray(double**&);
     
     /**
      *  name    setE   set the internal energy
@@ -136,6 +132,13 @@ protected:
      *
      **/
     void setE();
+    
+    /**
+     *  name    setU   set the transition matrix
+     *  return  void
+     *
+     **/
+    void setU();
     
     /**
      *  end time
@@ -178,23 +181,28 @@ protected:
     double* e = NULL;
     
     /**
-     *  gama
+     *  transition matrix
+     */
+    double** u = NULL;
+    
+    /**
+     *  gama γ
      */
     double gama = 1.4;
     
     /**
      *  file path
      */
-    string filePath = "~/";
+    string filePath = "";
 };
 
 
 NumFormat::~NumFormat()
 {
     deleteArray(p);
-    p = NULL;
     delete [] e;
     e = NULL;
+    deleteArray(u);
 }
 
 void NumFormat::setT(double value)
@@ -224,6 +232,7 @@ void NumFormat::setN(long value)
     setDeltaX();
     reset();
     setE();
+    setU();
 }
 
 void NumFormat::setMiddleX(double value)
@@ -236,13 +245,39 @@ void NumFormat::setMiddleX(double value)
 
 void NumFormat::setGama(double value)
 {
-    if (value<0) gama = 0;
+    if (value<=0) gama = 1.4;
     else gama = value;
 }
 
 void NumFormat::setFilePath(string str)
 {
     if (str != "") filePath = str;
+}
+
+NumFormat::NumFormat()
+{
+    setDeltaX();
+    reset();
+    setE();
+    setU();
+}
+
+void NumFormat::newArray(double**& arr)
+{
+    int i;
+    arr = new double*[3];
+    for(i=0;i<3;i++) arr[i] = new double[n];
+}
+
+void NumFormat::deleteArray(double**& arr)
+{
+    if (arr!=NULL)
+    {
+        int i;
+        for(i=0;i<3;i++) delete[] arr[i];
+        delete[] arr;
+        arr = NULL;
+    }
 }
 
 void NumFormat::setDeltaX()
@@ -272,31 +307,6 @@ void NumFormat::reset()
     }
 }
 
-void NumFormat::construction()
-{
-    setDeltaX();
-    reset();
-    setE();
-}
-
-void NumFormat::deleteArray(double**& arr)
-{
-    if (arr!=NULL)
-    {
-        int i;
-        for(i=0;i<3;i++) delete[] arr[i];
-        delete[] arr;
-        arr = NULL;
-    }
-}
-
-void NumFormat::newArray(double**& arr)
-{
-    int i;
-    arr = new double*[3];
-    for(i=0;i<3;i++) arr[i] = new double[n];
-}
-
 void NumFormat::setE()
 {
     long i;
@@ -306,6 +316,19 @@ void NumFormat::setE()
     }
     e = new double[n];
     for(i=0;i<n;i++) e[i] = p[2][i]/(gama-1)+0.5*p[1][i]*p[0][i]*p[0][i];
+}
+
+void NumFormat::setU()
+{
+    long i;
+    deleteArray(u);
+    newArray(u);
+    for(i=0;i<n;i++)
+    {
+        u[0][i] = p[1][i];
+        u[1][i] = p[0][i]*p[1][i];
+        u[2][i] = e[i];
+    }
 }
 
 #endif /* NumFormat_hpp */
