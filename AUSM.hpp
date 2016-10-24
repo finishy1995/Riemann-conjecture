@@ -89,7 +89,7 @@ void AUSM::solve()
         if (tNow+deltaT>t) deltaT=t-tNow;
         
         // Use there-order Runge-Kutta to solve the Riemann Problem
-        for(i=1;i<(n-1);i++)
+        for(i=0;i<(n-1);i++)
         {
             RiemannSolve(i, u, f);
             for(j=0;j<3;j++)
