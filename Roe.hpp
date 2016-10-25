@@ -49,6 +49,7 @@ private:
     double tol = 0.000001;
 };
 
+
 void Roe::output(string filename) const
 {
     long i,j;
@@ -181,16 +182,6 @@ void Roe::RiemannSolve(long index, double**& uTemp, double**& f)
     if (fabs(s[0]-s[1])>=tol) lamda[2] = fabs(s[0]-s[1]);
     else lamda[2]=((s[0]-s[1])*(s[0]-s[1])+tol*tol)/2.0/tol;
     
-    
-    /*d_u=UR-UL;
-     Sm1=(gama-1)/a_^2*(d_u(1)*(H_-u_^2)+u_*d_u(2)-d_u(3));
-     Sm2=1/2/a_*(d_u(1)*(-u_+a_)+d_u(2)-a_*Sm1);
-     Sm3=d_u(1)-Sm1-Sm2;
-     Sm=[Sm1;Sm2;Sm3];
-     %solve flux at i+1/2
-     FL=[rL*vL;rL*vL^2+pL;(EL+pL)*vL];
-     FR=[rR*vR;rR*vR^2+pR;(ER+pR)*vR];
-     out_flux=1/2*(FL+FR)-1/2*S*(abs_lamda.*Sm);*/
     // Matrix operation (expand and simplify)
     double S[3][3] = {1,1,1,s[0],s[0]+s[1],s[0]-s[1],0.5*s[0]*s[0],s[2]+s[0]*s[1],s[2]-s[0]*s[1]};
     sm[0] = (gama-1)/(s[1]*s[1])*((r[0]-l[0])*(s[2]-s[0]*s[0])+s[0]*(r[1]*r[0]-l[1]*l[0])-(r[2]-l[2]));

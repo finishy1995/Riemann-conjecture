@@ -3,14 +3,11 @@
 %  Êä³öÍ¼Ïñ
 %
 
-function outPlot(value,matrix,filename,plotname,yname,bool)
+function outPlot(value,matrix,plotname,yname)
     plot(value(1):value(2):value(3),matrix);
-    if bool==1
-        title([plotname,'  Tol=',num2str(value(4))],'FontSize',12,'FontWeight','bold','FontName','phong');
-    else
-        title(plotname,'FontSize',12,'FontWeight','bold','FontName','phong');
-    end
+    hold on;
+    title([plotname,'  Tol=',num2str(value(4))],'FontSize',12,'FontWeight','bold','FontName','phong');
     xlabel('Position','FontWeight','bold');
     ylabel(yname,'FontWeight','bold');
-    print('-dpng',filename);
+    ylim([0 1]);
 end
