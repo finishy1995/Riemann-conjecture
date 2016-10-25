@@ -87,6 +87,9 @@ void Roe::solve()
     // CFL_new actual CFL; max max number to get the delta time
     double CFL_new,deltaT,temp,max;
     
+    reset();
+    setE();
+    setU();
     for(i=0;i<3;i++)
         for(j=0;j<n;j++)
             u1[i][j] = u[i][j];
@@ -163,14 +166,12 @@ void Roe::RiemannSolve(long index, double**& uTemp, double**& f)
     //      |  u   0   0  |     lamda[0] = u
     //      |  0  u+a  0  |     lamda[1] = u+a
     //      |  0   0  u-a |     lamda[2] = u-a
-    // s[0] u; s[1] a
+    // s[0] u; s[1] a; s[2] H
     s[0] = (sqrt(l[0])*l[1]+sqrt(r[0])*r[1])/(sqrt(l[0])+sqrt(r[0]));;
-    tempL = l[3]/(gama-1)+0.5*l[0]*l[1]*l[1];
-    tempR = r[3]/(gama-1)+0.5*r[0]*r[1]*r[1];
-    tempL = (tempL+l[3])/l[0];
-    tempR = (tempR+r[3])/r[0];
+    tempL = (l[2]+l[3])/l[0];
+    tempR = (r[2]+r[3])/r[0];
     s[2] = (sqrt(l[0])*tempL+sqrt(r[0])*tempR)/(sqrt(l[0])+sqrt(r[0]));
-    s[1] = sqrt((gama-1)*(s[2]-0.5*s[1]*s[1]));
+    s[1] = sqrt((gama-1)*(s[2]-0.5*s[0]*s[0]));
     
     // Get the lamda by contrast entropy correction
     if (fabs(s[0])>=tol) lamda[0] = fabs(s[0]);
@@ -180,6 +181,16 @@ void Roe::RiemannSolve(long index, double**& uTemp, double**& f)
     if (fabs(s[0]-s[1])>=tol) lamda[2] = fabs(s[0]-s[1]);
     else lamda[2]=((s[0]-s[1])*(s[0]-s[1])+tol*tol)/2.0/tol;
     
+    
+    /*d_u=UR-UL;
+     Sm1=(gama-1)/a_^2*(d_u(1)*(H_-u_^2)+u_*d_u(2)-d_u(3));
+     Sm2=1/2/a_*(d_u(1)*(-u_+a_)+d_u(2)-a_*Sm1);
+     Sm3=d_u(1)-Sm1-Sm2;
+     Sm=[Sm1;Sm2;Sm3];
+     %solve flux at i+1/2
+     FL=[rL*vL;rL*vL^2+pL;(EL+pL)*vL];
+     FR=[rR*vR;rR*vR^2+pR;(ER+pR)*vR];
+     out_flux=1/2*(FL+FR)-1/2*S*(abs_lamda.*Sm);*/
     // Matrix operation (expand and simplify)
     double S[3][3] = {1,1,1,s[0],s[0]+s[1],s[0]-s[1],0.5*s[0]*s[0],s[2]+s[0]*s[1],s[2]-s[0]*s[1]};
     sm[0] = (gama-1)/(s[1]*s[1])*((r[0]-l[0])*(s[2]-s[0]*s[0])+s[0]*(r[1]*r[0]-l[1]*l[0])-(r[2]-l[2]));
