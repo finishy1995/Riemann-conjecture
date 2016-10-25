@@ -70,6 +70,9 @@ void AUSM::solve()
     // CFL_new actual CFL; max max number to get the delta time
     double temp,deltaT,CFL_new,max;
     
+    reset();
+    setE();
+    setU();
     for(i=0;i<3;i++)
         for(j=0;j<n;j++)
             u1[i][j] = u[i][j];

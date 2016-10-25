@@ -101,6 +101,9 @@ void StegerWarming::solve()
     newArray(fN);
     long i,j,k;
     
+    reset();
+    setE();
+    setU();
     for(i=0;i<3;i++)
         for(j=0;j<n;j++)
             u1[i][j] = u[i][j];
