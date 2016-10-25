@@ -1,9 +1,9 @@
 %
 %  作者：王元恺  日期：2016-10-22
-%  读入文件数据并输出图像
+%  读入文件数据
 %
 
-function getPlot(filename,bool)
+function [value,Roe]=getPlot(filename)
     %%  获取图像数据
     fid=fopen([filename,'.txt'],'r');
     value = [];
@@ -17,9 +17,4 @@ function getPlot(filename,bool)
         Roe = [Roe;tline];
     end
     fclose(fid);
-
-    %%  输出图像
-    outPlot(value,Roe(1,:),[filename,'Velocity'],[filename,' 速度分布图'],'Velocity',bool);
-    outPlot(value,Roe(2,:),[filename,'Density'],[filename,' 密度分布图'],'Density',bool);
-    outPlot(value,Roe(3,:),[filename,'Pressure'],[filename,' 压力分布图'],'Pressure',bool);
 end
